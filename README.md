@@ -47,7 +47,7 @@ dependencies {
 
 ## EventBus API
 
-See [EventBus.java](https://github.com/rfresh2/SimpleEventBus/blob/mainline/src/main/java/com/github/rfresh2/SimpleEventBus.java)
+See [SimpleEventBus.java](https://github.com/rfresh2/SimpleEventBus/blob/mainline/src/main/java/com/github/rfresh2/SimpleEventBus.java)
 
 Example usage: [SimpleEventBusTest.java](https://github.com/rfresh2/SimpleEventBus/blob/mainline/src/test/java/com/github/rfresh2/SimpleEventBusTest.java)
 
