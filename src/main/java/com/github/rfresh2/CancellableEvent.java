@@ -1,10 +1,9 @@
 package com.github.rfresh2;
 
 /**
- * Example base class for events that can be cancelled.
+ * Base class for events that can be cancelled.
  *
- * Handling cancellations is the responsibility of users, there is no special handling in the event bus.
- * In other words, dispatchers and consumers should check if an event is cancelled and handle it accordingly.
+ * If an event is cancelled, it will not be passed to any further handlers.
  */
 public abstract class CancellableEvent {
     private boolean cancelled = false;

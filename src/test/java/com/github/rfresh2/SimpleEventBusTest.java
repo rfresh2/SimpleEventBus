@@ -90,8 +90,25 @@ public class SimpleEventBusTest {
         assertEquals(1, counter.get());
     }
 
+    @Test
+    public void cancellableEventTest() {
+        final SimpleEventBus bus = new SimpleEventBus(executorService);
+        final AtomicInteger counter = new AtomicInteger(0);
+        var obj1 = new Object();
+        var obj2 = new Object();
+
+        bus.subscribe(obj1, of(TestCancellableEvent.class, event -> {
+            counter.set(1);
+            event.cancel();
+        }));
+        bus.subscribe(obj2, of(TestCancellableEvent.class, event -> counter.set(2)));
+        bus.post(new TestCancellableEvent());
+        assertEquals(1, counter.get());
+    }
+
     public record TestEvent() { }
     public record AnotherTestEvent() { }
+    public static class TestCancellableEvent extends CancellableEvent { }
 
     public static class Foo {
         AtomicInteger counter = new AtomicInteger(0);

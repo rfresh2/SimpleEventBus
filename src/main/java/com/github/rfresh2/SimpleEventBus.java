@@ -75,10 +75,13 @@ public class SimpleEventBus {
     // handlers can throw and return exceptions - cancelling subsequent event executions
     public <T> void post(T event) {
         var consumers = eventConsumersMap.get(event.getClass());
+        var isCancellableEvent = event instanceof CancellableEvent;
         if (consumers != null) {
             for (int i = 0; i < consumers.length; i++) {
                 var consumer = consumers[i];
                 ((Consumer<T>) consumer.handler()).accept(event);
+                if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
+                    break;
             }
         }
     }
@@ -116,7 +119,6 @@ public class SimpleEventBus {
         }
     }
 
-    @SafeVarargs
     private synchronized Subscription subscribe(EventConsumer<?>... eventConsumers) {
         for (int i = 0; i < eventConsumers.length; i++) {
             var eventConsumer = eventConsumers[i];
@@ -139,26 +141,14 @@ public class SimpleEventBus {
         });
     }
 
-    private synchronized <T> Subscription subscribe(EventConsumer<T> eventConsumer) {
-        eventConsumersMap.compute(eventConsumer.eventClass(), (key, consumers) -> {
-            if (consumers == null) {
-                return new EventConsumer[]{eventConsumer};
-            } else {
-                final EventConsumer<?>[] newConsumers = new EventConsumer[consumers.length + 1];
-                System.arraycopy(consumers, 0, newConsumers, 0, consumers.length);
-                newConsumers[consumers.length] = eventConsumer;
-                Arrays.sort(newConsumers);
-                return newConsumers;
-            }
-        });
-        return new Subscription(() -> removeEventConsumer(eventConsumer));
-    }
-
     private <T> void postAsyncInternal(T event, EventConsumer<?>[] eventConsumers) {
         try {
+            var isCancellableEvent = event instanceof CancellableEvent;
             for (int i = 0; i < eventConsumers.length; i++) {
                 var consumer = eventConsumers[i];
                 ((Consumer<T>) consumer.handler()).accept(event);
+                if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
+                    break;
             }
         } catch (final Throwable e) { // swallow exception so we don't kill the executor
             logger.debug("Error handling async event", e);

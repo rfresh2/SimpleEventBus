@@ -4,9 +4,10 @@ Minimal, High Performance Java EventBus
 
 # Features
 
-* Minimal API, no reflection or annotations (could be a con for some)
+* Minimal API, no reflection or annotations processing
 * Asynchronous and Synchronous Event Dispatching
 * Event Priorities
+* Cancellable Events
 
 ## Why?
 
