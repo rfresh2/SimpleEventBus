@@ -6,7 +6,7 @@
 
   <groupId>com.github.rfresh2</groupId>
   <artifactId>SimpleEventBus</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 
   <name>SimpleEventBus</name>
   <url>https://github.com/rfresh2/SimpleEventBus</url>
