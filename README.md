@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.rfresh2:SimpleEventBus:1.0'
+    implementation 'com.github.rfresh2:SimpleEventBus:1.1'
 }
 ```
 
@@ -39,11 +39,13 @@ dependencies {
     </repository>
 </repositories>
 
-<dependency>
-    <groupId>com.github.rfresh2</groupId>
-    <artifactId>SimpleEventBus</artifactId>
-    <version>1.0</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.github.rfresh2</groupId>
+        <artifactId>SimpleEventBus</artifactId>
+        <version>1.1</version>
+    </dependency>
+</dependencies>
 ```
 
 ## EventBus API
