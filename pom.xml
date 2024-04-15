@@ -28,7 +28,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.12</version>
+      <version>2.0.13</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>net.lenni0451</groupId>
       <artifactId>LambdaEvents</artifactId>
-      <version>2.4.1</version>
+      <version>2.4.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -87,7 +87,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
