@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 public record EventConsumer<T>(Class<T> eventClass, int priority, Consumer<T> handler) implements Comparable<EventConsumer<T>> {
     @Override
     public int compareTo(EventConsumer o) {
-        return Integer.compare(priority, o.priority);
+        return Integer.compare(o.priority, priority); // descending order
     }
 
     public static <T> EventConsumer<T> of(Class<T> clazz, Consumer<T> handler) {

@@ -81,13 +81,13 @@ public class SimpleEventBusTest {
         bus.subscribe(obj2, of(TestEvent.class, 2, event -> counter.set(2)));
         bus.subscribe(obj3, of(TestEvent.class, 3, event -> counter.set(3)));
         bus.post(new TestEvent());
-        assertEquals(3, counter.get());
-        bus.unsubscribe(obj3);
+        assertEquals(1, counter.get());
+        bus.unsubscribe(obj1);
         bus.post(new TestEvent());
         assertEquals(2, counter.get());
         bus.unsubscribe(obj2);
         bus.post(new TestEvent());
-        assertEquals(1, counter.get());
+        assertEquals(3, counter.get());
     }
 
     @Test
