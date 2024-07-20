@@ -100,4 +100,10 @@
       </plugins>
     </pluginManagement>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>maven.2b2t.vc</id>
+      <url>https://maven.2b2t.vc/releases</url>
+    </repository>
+  </distributionManagement>
 </project>
