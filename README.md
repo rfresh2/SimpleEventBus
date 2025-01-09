@@ -11,18 +11,22 @@ Minimal, High Performance Java EventBus
 
 ## Why?
 
-I use GraalVM in projects like [ZenithProxy](https://github.com/rfresh2/ZenithProxy)
+Typical Java Event Buses use annotations and reflection to subscribe or invoke event handlers
 
-Using GraalVM with reflection is painful as each reflective call needs to be registered at build time.
+I use [GraalVM native image](https://www.graalvm.org/) in projects like [ZenithProxy](https://github.com/rfresh2/ZenithProxy)
+
+Using GraalVM with reflection is painful as each reflective call [needs to be specified in a metadata file](https://www.graalvm.org/latest/reference-manual/native-image/metadata/#reflection) at build time
 
 # Usage
 
 ## Add Dependency
 
 ### Gradle
+
+Groovy:
 ```groovy
 repositories {
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.2b2t.vc/releases' }
 }
 
 dependencies {
@@ -30,12 +34,23 @@ dependencies {
 }
 ```
 
+Kotlin:
+```kotlin
+repositories {
+    maven("https://maven.2b2t.vc/releases")
+}
+
+dependencies {
+    implementation("com.github.rfresh2:SimpleEventBus:1.2")
+}
+```
+
 ### Maven
 ```xml
 <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url> 
+        <id>maven.2b2t.vc</id>
+        <url>https://maven.2b2t.vc/releases</url> 
     </repository>
 </repositories>
 
