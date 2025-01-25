@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.IdentityHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -90,6 +91,12 @@ public class SimpleEventBus {
         var consumers = eventConsumersMap.get(event.getClass());
         if (consumers != null)
             asyncEventExecutor.execute(() -> this.postAsyncInternal(event, consumers));
+    }
+
+    public <T> void postAsync(T event, Executor executor) {
+        var consumers = eventConsumersMap.get(event.getClass());
+        if (consumers != null)
+            executor.execute(() -> this.postAsyncInternal(event, consumers));
     }
 
 

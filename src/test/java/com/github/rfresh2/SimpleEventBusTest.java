@@ -71,6 +71,20 @@ public class SimpleEventBusTest {
     }
 
     @Test
+    public void postAsyncTest2() {
+        final SimpleEventBus bus = new SimpleEventBus();
+        final Foo foo = new Foo();
+        foo.subscribe(bus);
+        bus.postAsync(new TestEvent(), executorService);
+        Wait.waitUntilCondition(() -> foo.counter.get() == 1, 1000);
+        assertEquals(1, foo.counter.get());
+        bus.unsubscribe(foo);
+        bus.postAsync(new TestEvent(), executorService);
+        Wait.waitALittle(1);
+        assertEquals(1, foo.counter.get());
+    }
+
+    @Test
     public void prioritiesTest() {
         final SimpleEventBus bus = new SimpleEventBus(executorService);
         final AtomicInteger counter = new AtomicInteger(0);
