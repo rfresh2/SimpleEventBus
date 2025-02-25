@@ -73,16 +73,19 @@ public class SimpleEventBus {
         if (sub != null) sub.unsubscribe();
     }
 
-    // handlers can throw and return exceptions - cancelling subsequent event executions
     public <T> void post(T event) {
         var consumers = eventConsumersMap.get(event.getClass());
         var isCancellableEvent = event instanceof CancellableEvent;
         if (consumers != null) {
             for (int i = 0; i < consumers.length; i++) {
                 var consumer = consumers[i];
-                ((Consumer<T>) consumer.handler()).accept(event);
-                if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
-                    break;
+                try {
+                    ((Consumer<T>) consumer.handler()).accept(event);
+                    if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
+                        break;
+                } catch (final Throwable e) {
+                    logger.error("Caught exception while handling event: {}", event.getClass(), e);
+                }
             }
         }
     }
@@ -153,12 +156,16 @@ public class SimpleEventBus {
             var isCancellableEvent = event instanceof CancellableEvent;
             for (int i = 0; i < eventConsumers.length; i++) {
                 var consumer = eventConsumers[i];
-                ((Consumer<T>) consumer.handler()).accept(event);
-                if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
-                    break;
+                try {
+                    ((Consumer<T>) consumer.handler()).accept(event);
+                    if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
+                        break;
+                } catch (final Throwable e) {
+                    logger.error("Caught exception while handling async event: {}", event.getClass(), e);
+                }
             }
         } catch (final Throwable e) { // swallow exception so we don't kill the executor
-            logger.debug("Error handling async event", e);
+            logger.error("Error handling async event", e);
         }
     }
 }
