@@ -12,12 +12,8 @@ import java.util.function.Consumer;
 
 /**
  * A simple event bus without reflection.
- *
- * Subscriptions are owned by object references.
- * It's important to unsubscribe when the object is no longer needed.
- * Failing to do this will block GC of the object and existing event handlers will still be called
- *
- * Event priority is ordered by larger priority ints being called first.
+ * <p>
+ * Event priority is ordered by larger priority values being called first.
  * The default priority is 0.
  */
 public class SimpleEventBus {
@@ -75,6 +71,26 @@ public class SimpleEventBus {
 
     public <T> void post(T event) {
         var consumers = eventConsumersMap.get(event.getClass());
+        postInternal(event, consumers);
+    }
+
+    public <T> void postAsync(T event) {
+        postAsync(event, asyncEventExecutor);
+    }
+
+    public <T> void postAsync(T event, Executor executor) {
+        var consumers = eventConsumersMap.get(event.getClass());
+        if (consumers != null)
+            executor.execute(() -> this.postInternal(event, consumers));
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // Internal API
+    //////////////////////////////////////////////////////////////////////
+
+
+    private <T> void postInternal(final T event, final EventConsumer<?>[] consumers) {
         var isCancellableEvent = event instanceof CancellableEvent;
         if (consumers != null) {
             for (int i = 0; i < consumers.length; i++) {
@@ -90,24 +106,7 @@ public class SimpleEventBus {
         }
     }
 
-    public <T> void postAsync(T event) {
-        var consumers = eventConsumersMap.get(event.getClass());
-        if (consumers != null)
-            asyncEventExecutor.execute(() -> this.postAsyncInternal(event, consumers));
-    }
-
-    public <T> void postAsync(T event, Executor executor) {
-        var consumers = eventConsumersMap.get(event.getClass());
-        if (consumers != null)
-            executor.execute(() -> this.postAsyncInternal(event, consumers));
-    }
-
-
-    //////////////////////////////////////////////////////////////////////
-    // Internal API
-    //////////////////////////////////////////////////////////////////////
-
-    private synchronized void removeEventConsumer(EventConsumer<?> eventConsumer) {
+    synchronized void removeEventConsumer(EventConsumer<?> eventConsumer) {
         var consumers = eventConsumersMap.get(eventConsumer.eventClass());
         if (consumers != null) {
             int index = -1;
@@ -144,28 +143,6 @@ public class SimpleEventBus {
                 }
             });
         }
-        return new Subscription(() -> {
-            for (int i = 0; i < eventConsumers.length; i++) {
-                removeEventConsumer(eventConsumers[i]);
-            }
-        });
-    }
-
-    private <T> void postAsyncInternal(T event, EventConsumer<?>[] eventConsumers) {
-        try {
-            var isCancellableEvent = event instanceof CancellableEvent;
-            for (int i = 0; i < eventConsumers.length; i++) {
-                var consumer = eventConsumers[i];
-                try {
-                    ((Consumer<T>) consumer.handler()).accept(event);
-                    if (isCancellableEvent && ((CancellableEvent) event).isCancelled())
-                        break;
-                } catch (final Throwable e) {
-                    logger.error("Caught exception while handling async event: {}", event.getClass(), e);
-                }
-            }
-        } catch (final Throwable e) { // swallow exception so we don't kill the executor
-            logger.error("Error handling async event", e);
-        }
+        return new Subscription(this, eventConsumers);
     }
 }

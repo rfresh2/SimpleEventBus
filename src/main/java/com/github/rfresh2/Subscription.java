@@ -1,13 +1,10 @@
 package com.github.rfresh2;
 
-class Subscription {
-    private final Runnable unsubscribeCallback;
-
-    public Subscription(Runnable unsubscribeCallback) {
-        this.unsubscribeCallback = unsubscribeCallback;
-    }
-
+record Subscription(SimpleEventBus eventBus, EventConsumer<?>[] eventConsumers) {
     public void unsubscribe() {
-        unsubscribeCallback.run();
+        for (int i = 0; i < eventConsumers.length; i++) {
+            EventConsumer<?> eventConsumer = eventConsumers[i];
+            eventBus.removeEventConsumer(eventConsumer);
+        }
     }
 }
