@@ -57,6 +57,19 @@ public class SimpleEventBusTest {
     }
 
     @Test
+    public void subscribeAddTest() {
+        final SimpleEventBus bus = new SimpleEventBus(executorService);
+        final Baz baz = new Baz();
+        bus.subscribe(baz, of(TestEvent.class, baz::handleTestEvent));
+        bus.post(new TestEvent());
+        assertEquals(1, baz.counter.get());
+        bus.subscribeAdd(baz, of(AnotherTestEvent.class, baz::handleAnotherTestEvent));
+        bus.post(new TestEvent());
+        bus.post(new AnotherTestEvent());
+        assertEquals(3, baz.counter.get());
+    }
+
+    @Test
     public void postAsyncTest() {
         final SimpleEventBus bus = new SimpleEventBus(executorService);
         final Foo foo = new Foo();

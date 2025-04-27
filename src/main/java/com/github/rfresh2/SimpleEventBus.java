@@ -40,23 +40,30 @@ public class SimpleEventBus {
     }
 
     public <T> void subscribe(Object subscriber, Class<T> eventType, Consumer<T> handler) {
-        var existingSub = subscribersMap.remove(subscriber);
-        if (existingSub != null) existingSub.unsubscribe();
+        unsubscribe(subscriber);
         var sub = subscribe(EventConsumer.of(eventType, handler));
         subscribersMap.put(subscriber, sub);
     }
 
-    public <T> void subscribe(Object subscriber, EventConsumer<T> eventConsumer) {
-        var existingSub = subscribersMap.remove(subscriber);
-        if (existingSub != null) existingSub.unsubscribe();
-        var sub = subscribe(eventConsumer);
+    public void subscribe(Object subscriber, EventConsumer<?>... eventConsumers) {
+        unsubscribe(subscriber);
+        var sub = subscribe(eventConsumers);
         subscribersMap.put(subscriber, sub);
     }
 
-    public final void subscribe(Object subscriber, EventConsumer<?>... eventConsumers) {
+    // instead of replacing the existing subscription, create a new subscription with both existing and new consumers
+    public void subscribeAdd(Object subscriber, EventConsumer<?>... eventConsumers) {
         var existingSub = subscribersMap.remove(subscriber);
-        if (existingSub != null) existingSub.unsubscribe();
-        var sub = subscribe(eventConsumers);
+        EventConsumer<?>[] joinedConsumers;
+        if (existingSub != null) {
+            existingSub.unsubscribe();
+            joinedConsumers = new EventConsumer[existingSub.eventConsumers().length + eventConsumers.length];
+            System.arraycopy(existingSub.eventConsumers(), 0, joinedConsumers, 0, existingSub.eventConsumers().length);
+            System.arraycopy(eventConsumers, 0, joinedConsumers, existingSub.eventConsumers().length, eventConsumers.length);
+        } else {
+            joinedConsumers = eventConsumers;
+        }
+        var sub = subscribe(joinedConsumers);
         subscribersMap.put(subscriber, sub);
     }
 
