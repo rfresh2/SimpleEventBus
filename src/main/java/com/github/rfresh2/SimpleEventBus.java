@@ -3,8 +3,7 @@ package com.github.rfresh2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.IdentityHashMap;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -67,10 +66,6 @@ public class SimpleEventBus {
         subscribersMap.put(subscriber, sub);
     }
 
-    public boolean isSubscribed(Object subscriber) {
-        return subscribersMap.containsKey(subscriber);
-    }
-
     public void unsubscribe(Object subscriber) {
         var sub = subscribersMap.remove(subscriber);
         if (sub != null) sub.unsubscribe();
@@ -91,6 +86,23 @@ public class SimpleEventBus {
             executor.execute(() -> this.postInternal(event, consumers));
     }
 
+    public boolean isSubscribed(Object subscriber) {
+        return subscribersMap.containsKey(subscriber);
+    }
+
+    public Collection<Class<?>> subscribedEvents(Object subscriber) {
+        var sub = subscribersMap.get(subscriber);
+        if (sub != null) {
+            Set<Class<?>> eventClasses = new HashSet<>();
+            EventConsumer<?>[] eventConsumers = sub.eventConsumers();
+            for (int i = 0; i < eventConsumers.length; i++) {
+                final var consumer = eventConsumers[i];
+                eventClasses.add(consumer.eventClass());
+            }
+            return eventClasses;
+        }
+        return Collections.emptyList();
+    }
 
     //////////////////////////////////////////////////////////////////////
     // Internal API

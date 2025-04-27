@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.rfresh2.EventConsumer.of;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleEventBusTest {
 
@@ -131,6 +131,29 @@ public class SimpleEventBusTest {
         bus.subscribe(obj2, of(TestCancellableEvent.class, event -> counter.set(2)));
         bus.post(new TestCancellableEvent());
         assertEquals(1, counter.get());
+    }
+
+    @Test
+    public void isSubscribedTest() {
+        final SimpleEventBus bus = new SimpleEventBus(executorService);
+        final Foo foo = new Foo();
+        assertFalse(bus.isSubscribed(foo));
+        foo.subscribe(bus);
+        assertTrue(bus.isSubscribed(foo));
+        bus.unsubscribe(foo);
+        assertFalse(bus.isSubscribed(foo));
+    }
+
+    @Test
+    public void subscribedEventsTest() {
+        final SimpleEventBus bus = new SimpleEventBus(executorService);
+        final Foo foo = new Foo();
+        assertEquals(0, bus.subscribedEvents(foo).size());
+        foo.subscribe(bus);
+        assertEquals(1, bus.subscribedEvents(foo).size());
+        assertTrue(bus.subscribedEvents(foo).contains(TestEvent.class));
+        bus.unsubscribe(foo);
+        assertEquals(0, bus.subscribedEvents(foo).size());
     }
 
     public record TestEvent() { }
