@@ -44,6 +44,12 @@ public class SimpleEventBus {
         subscribersMap.put(subscriber, sub);
     }
 
+    public <T> void subscribe(Object subscriber, EventConsumer<T> eventConsumer) {
+        unsubscribe(subscriber);
+        var sub = subscribe(eventConsumer);
+        subscribersMap.put(subscriber, sub);
+    }
+
     public void subscribe(Object subscriber, EventConsumer<?>... eventConsumers) {
         unsubscribe(subscriber);
         var sub = subscribe(eventConsumers);
