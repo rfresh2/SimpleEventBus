@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.rfresh2:SimpleEventBus:1.5'
+    implementation 'com.github.rfresh2:SimpleEventBus:1.6'
 }
 ```
 
@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.rfresh2:SimpleEventBus:1.5")
+    implementation("com.github.rfresh2:SimpleEventBus:1.6")
 }
 ```
 
@@ -58,7 +58,7 @@ dependencies {
     <dependency>
         <groupId>com.github.rfresh2</groupId>
         <artifactId>SimpleEventBus</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
     </dependency>
 </dependencies>
 ```
